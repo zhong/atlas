@@ -127,13 +127,13 @@ type RecordType string
 
 // RecordType values.
 const (
-	RecordTypeIn       RecordType = "in"
-	RecordTypeOut      RecordType = "out"
-	RecordTypeTransfer RecordType = "transfer"
-	RecordTypeAdjust   RecordType = "adjust"
-	RecordTypeCheck    RecordType = "check"
-	RecordTypeBorrow   RecordType = "borrow"
-	RecordTypeReturn   RecordType = "return"
+	RecordTypeInbound    RecordType = "inbound"
+	RecordTypeOutbound   RecordType = "outbound"
+	RecordTypeTransfer   RecordType = "transfer"
+	RecordTypeAdjust     RecordType = "adjust"
+	RecordTypeCheck      RecordType = "check"
+	RecordTypeBorrow     RecordType = "borrow"
+	RecordTypeReturnItem RecordType = "return_item"
 )
 
 func (rt RecordType) String() string {
@@ -143,7 +143,7 @@ func (rt RecordType) String() string {
 // RecordTypeValidator is a validator for the "record_type" field enum values. It is called by the builders before save.
 func RecordTypeValidator(rt RecordType) error {
 	switch rt {
-	case RecordTypeIn, RecordTypeOut, RecordTypeTransfer, RecordTypeAdjust, RecordTypeCheck, RecordTypeBorrow, RecordTypeReturn:
+	case RecordTypeInbound, RecordTypeOutbound, RecordTypeTransfer, RecordTypeAdjust, RecordTypeCheck, RecordTypeBorrow, RecordTypeReturnItem:
 		return nil
 	default:
 		return fmt.Errorf("inventoryrecord: invalid enum value for record_type field: %q", rt)

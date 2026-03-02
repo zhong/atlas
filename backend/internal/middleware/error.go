@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/your-org/asset-management/pkg/logger"
-	"github.com/your-org/asset-management/pkg/utils"
+	"github.com/your-org/atlas/pkg/logger"
+	"github.com/your-org/atlas/pkg/utils"
 	"go.uber.org/zap"
 )
 

@@ -23,13 +23,7 @@ func NewClient(cfg *config.DatabaseConfig) (*ent.Client, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	// 配置连接池
-	db := client.Driver().(*ent.Driver).DB()
-	db.SetMaxOpenConns(cfg.MaxOpen)
-	db.SetMaxIdleConns(cfg.MaxIdle)
-	db.SetConnMaxLifetime(time.Hour)
-
-	// 测试连接
+	// 测试连接并创建schema
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

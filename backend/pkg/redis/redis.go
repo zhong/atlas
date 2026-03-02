@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/your-org/asset-management/pkg/config"
+	"github.com/your-org/atlas/pkg/config"
 )
 
 // NewClient 创建Redis客户端

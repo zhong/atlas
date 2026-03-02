@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/your-org/asset-management/pkg/config"
-	"github.com/your-org/asset-management/pkg/jwt"
-	"github.com/your-org/asset-management/pkg/utils"
+	"github.com/your-org/atlas/pkg/config"
+	"github.com/your-org/atlas/pkg/jwt"
+	"github.com/your-org/atlas/pkg/utils"
 )
 
 // Auth JWT认证中间件

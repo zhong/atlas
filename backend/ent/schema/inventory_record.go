@@ -22,8 +22,8 @@ func (InventoryRecord) Fields() []ent.Field {
 			NotEmpty().
 			Comment("记录编号"),
 		field.Enum("record_type").
-			Values("in", "out", "transfer", "adjust", "check", "borrow", "return").
-			Comment("记录类型：in-入库, out-出库, transfer-调拨, adjust-调整, check-盘点, borrow-借出, return-归还"),
+			Values("inbound", "outbound", "transfer", "adjust", "check", "borrow", "return_item").
+			Comment("记录类型：inbound-入库, outbound-出库, transfer-调拨, adjust-调整, check-盘点, borrow-借出, return_item-归还"),
 		field.Int("quantity").
 			Default(1).
 			Comment("数量"),

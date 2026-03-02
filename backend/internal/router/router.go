@@ -4,9 +4,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/your-org/asset-management/ent"
-	"github.com/your-org/asset-management/internal/middleware"
-	"github.com/your-org/asset-management/pkg/config"
+	"github.com/your-org/atlas/ent"
+	"github.com/your-org/atlas/internal/middleware"
+	"github.com/your-org/atlas/pkg/config"
 )
 
 // Setup 设置路由

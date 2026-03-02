@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/your-org/atlas/ent"
+	"github.com/your-org/atlas/ent/assettype"
+	"github.com/your-org/atlas/ent/warehouse"
 	"github.com/your-org/atlas/pkg/config"
 	"golang.org/x/crypto/bcrypt"
 
@@ -237,15 +238,15 @@ func createWarehouses(ctx context.Context, client *ent.Client) []*ent.Warehouse 
 	warehouses := []struct {
 		name          string
 		code          string
-		warehouseType string
+		warehouseType warehouse.WarehouseType
 		location      string
 		address       string
 	}{
-		{"2号AI库", "WH-AI-02", "idc", "青岛", "山东省青岛市"},
-		{"1号库", "WH-01", "warehouse", "北京", "北京市海淀区"},
-		{"3号库", "WH-03", "warehouse", "上海", "上海市浦东新区"},
-		{"5号基地库", "WH-05", "idc", "广州", "广东省广州市"},
-		{"北京小库房", "WH-BJ-SMALL", "warehouse", "北京", "北京市朝阳区"},
+		{"2号AI库", "WH-AI-02", warehouse.WarehouseTypeIdc, "青岛", "山东省青岛市"},
+		{"1号库", "WH-01", warehouse.WarehouseTypeWarehouse, "北京", "北京市海淀区"},
+		{"3号库", "WH-03", warehouse.WarehouseTypeWarehouse, "上海", "上海市浦东新区"},
+		{"5号基地库", "WH-05", warehouse.WarehouseTypeIdc, "广州", "广东省广州市"},
+		{"北京小库房", "WH-BJ-SMALL", warehouse.WarehouseTypeWarehouse, "北京", "北京市朝阳区"},
 	}
 
 	var result []*ent.Warehouse
@@ -300,16 +301,16 @@ func createAssetTypes(ctx context.Context, client *ent.Client) []*ent.AssetType 
 	assetTypes := []struct {
 		name        string
 		code        string
-		category    string
+		category    assettype.Category
 		description string
 	}{
-		{"GPU服务器", "GPU-SERVER", "server", "配备GPU的服务器"},
-		{"CPU服务器", "CPU-SERVER", "server", "标准CPU服务器"},
-		{"交换机-25G", "SWITCH-25G", "switch", "25G以太网交换机"},
-		{"交换机-100G", "SWITCH-100G", "switch", "100G以太网交换机"},
-		{"网卡-25G", "NIC-25G", "network_card", "25G网卡"},
-		{"网卡-100G", "NIC-100G", "network_card", "100G网卡"},
-		{"存储设备", "STORAGE", "storage", "存储系统"},
+		{"GPU服务器", "GPU-SERVER", assettype.CategoryServer, "配备GPU的服务器"},
+		{"CPU服务器", "CPU-SERVER", assettype.CategoryServer, "标准CPU服务器"},
+		{"交换机-25G", "SWITCH-25G", assettype.CategorySwitch, "25G以太网交换机"},
+		{"交换机-100G", "SWITCH-100G", assettype.CategorySwitch, "100G以太网交换机"},
+		{"网卡-25G", "NIC-25G", assettype.CategoryNetworkCard, "25G网卡"},
+		{"网卡-100G", "NIC-100G", assettype.CategoryNetworkCard, "100G网卡"},
+		{"存储设备", "STORAGE", assettype.CategoryStorage, "存储系统"},
 	}
 
 	var result []*ent.AssetType

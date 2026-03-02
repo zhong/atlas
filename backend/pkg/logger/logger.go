@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"github.com/your-org/asset-management/pkg/config"
+	"github.com/your-org/atlas/pkg/config"
 )
 
 var globalLogger *zap.Logger

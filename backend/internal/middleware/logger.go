@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/your-org/asset-management/pkg/logger"
+	"github.com/your-org/atlas/pkg/logger"
 	"go.uber.org/zap"
 )
 
