@@ -5,7 +5,11 @@
 ✅ 技术架构文档已完成
 ✅ Docker开发环境已配置
 ✅ 后端项目脚手架已搭建
-⏳ 数据模型Schema待定义
+✅ 数据模型Schema已定义（21个实体）
+✅ Ent代码已生成（76个文件，22,637行代码）
+✅ Excel业务文件已分析
+✅ Git仓库已初始化并推送到GitHub
+⏳ 数据库迁移待创建
 ⏳ 前端项目待搭建
 
 ## 立即开始开发
@@ -49,68 +53,32 @@ make install
 # 这是正常的，下一步我们将定义Schema
 ```
 
-## 下一步：定义数据模型
+## 下一步：数据库迁移和初始数据
 
-我们需要在 `backend/ent/schema/` 目录下创建Schema文件。
+数据模型已经定义完成，现在需要：
 
-### 优先级P0实体（必须先实现）
+1. **创建数据库迁移脚本**
+2. **初始化数据库表结构**
+3. **创建初始数据（种子数据）**
 
-1. **User** - 用户
-2. **Role** - 角色
-3. **Permission** - 权限
-4. **AssetType** - 资产类型
-5. **Asset** - 资产
-6. **Location** - 库位
-7. **Warehouse** - 仓库
-8. **InventoryRecord** - 库存记录
+### 数据模型概览
 
-### 示例：创建User Schema
+已定义21个实体：
+- **P0**: User, Role, Permission, Warehouse, Location, AssetType, Asset, InventoryRecord
+- **P1**: Supplier, PurchaseOrder, OrderItem, DataCenter, Room, Rack, RackUnit, Approval, ApprovalNode, NetworkConnection, IPAddress, RepairVendor, RepairTicket
 
-```go
-// backend/ent/schema/user.go
-package schema
+详见 `docs/DATA_MODEL.md` 获取完整的数据模型设计文档。
 
-import (
-    "entgo.io/ent"
-    "entgo.io/ent/schema/field"
-    "entgo.io/ent/schema/edge"
-    "time"
-)
-
-type User struct {
-    ent.Schema
-}
-
-func (User) Fields() []ent.Field {
-    return []ent.Field{
-        field.String("username").Unique().Comment("用户名"),
-        field.String("password").Sensitive().Comment("密码"),
-        field.String("email").Unique().Comment("邮箱"),
-        field.String("phone").Optional().Comment("电话"),
-        field.String("real_name").Comment("真实姓名"),
-        field.Enum("status").Values("active", "inactive", "locked").Default("active").Comment("状态"),
-        field.Time("last_login_at").Optional().Comment("最后登录时间"),
-        field.Time("created_at").Default(time.Now).Comment("创建时间"),
-        field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now).Comment("更新时间"),
-    }
-}
-
-func (User) Edges() []ent.Edge {
-    return []ent.Edge{
-        edge.To("roles", Role.Type),
-    }
-}
-```
-
-### 生成代码
+### 示例：查看生成的代码
 
 ```bash
 cd backend
 
-# 生成Ent代码
-make generate
+# 查看生成的实体
+ls -la ent/
 
-# 如果成功，会在ent目录下生成大量代码
+# 查看Asset实体
+cat ent/asset/asset.go
 ```
 
 ### 运行后端服务
