@@ -8,12 +8,12 @@ import (
 	"syscall"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/your-org/asset-management/internal/middleware"
-	"github.com/your-org/asset-management/internal/router"
-	"github.com/your-org/asset-management/pkg/config"
-	"github.com/your-org/asset-management/pkg/database"
-	"github.com/your-org/asset-management/pkg/logger"
-	redisClient "github.com/your-org/asset-management/pkg/redis"
+	"github.com/your-org/atlas/internal/middleware"
+	"github.com/your-org/atlas/internal/router"
+	"github.com/your-org/atlas/pkg/config"
+	"github.com/your-org/atlas/pkg/database"
+	"github.com/your-org/atlas/pkg/logger"
+	redisClient "github.com/your-org/atlas/pkg/redis"
 	"go.uber.org/zap"
 )
 

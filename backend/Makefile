@@ -1,4 +1,4 @@
-.PHONY: help install generate build run test lint clean docker-up docker-down
+.PHONY: help install generate build run test lint clean docker-up docker-down migrate seed reset-db
 
 # 默认目标
 help:
@@ -14,6 +14,9 @@ help:
 	@echo "  make clean        - Clean build artifacts"
 	@echo "  make docker-up    - Start Docker services"
 	@echo "  make docker-down  - Stop Docker services"
+	@echo "  make migrate      - Run database migrations"
+	@echo "  make seed         - Seed database with initial data"
+	@echo "  make reset-db     - Reset database (migrate + seed)"
 
 # 安装依赖
 install:
@@ -71,3 +74,17 @@ docker-ps:
 docker-logs:
 	@echo "Docker services logs..."
 	cd .. && docker-compose logs -f
+
+# 运行数据库迁移
+migrate:
+	@echo "Running database migrations..."
+	go run cmd/migrate/main.go
+
+# 填充初始数据
+seed:
+	@echo "Seeding database..."
+	go run cmd/seed/main.go
+
+# 重置数据库（迁移+种子数据）
+reset-db: migrate seed
+	@echo "Database reset completed!"

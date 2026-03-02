@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/your-org/asset-management/ent"
-	"github.com/your-org/asset-management/pkg/config"
+	"github.com/your-org/atlas/ent"
+	"github.com/your-org/atlas/pkg/config"
 
 	_ "github.com/lib/pq"
 )
