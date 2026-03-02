@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/your-org/atlas/ent"
+	"github.com/your-org/atlas/internal/handler/auth"
 	"github.com/your-org/atlas/internal/middleware"
 	"github.com/your-org/atlas/pkg/config"
 )
@@ -30,13 +31,13 @@ func Setup(app *fiber.App, client *ent.Client, cfg *config.Config) {
 	// API v1路由组
 	v1 := app.Group("/api/v1")
 
+	// 初始化处理器
+	authHandler := auth.NewHandler(client, cfg)
+
 	// 公开路由（不需要认证）
 	public := v1.Group("")
 	{
-		// TODO: 添加登录、注册等公开接口
-		public.Post("/auth/login", func(c *fiber.Ctx) error {
-			return c.JSON(fiber.Map{"message": "login endpoint"})
-		})
+		public.Post("/auth/login", authHandler.Login)
 	}
 
 	// 需要认证的路由
