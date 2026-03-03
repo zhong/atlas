@@ -83,6 +83,11 @@ func main() {
 	dataCenters := createDataCenters(ctx, client)
 	log.Printf("✅ Created %d data centers", len(dataCenters))
 
+	// 9. 创建示例资产
+	log.Println("\n💻 Creating sample assets...")
+	assets := createAssets(ctx, client, assetTypes, warehouses, locations, suppliers)
+	log.Printf("✅ Created %d assets", len(assets))
+
 	log.Println("\n✅ Database seeding completed successfully!")
 	log.Println("\n📊 Summary:")
 	log.Printf("  - Permissions: %d", len(permissions))
@@ -93,6 +98,7 @@ func main() {
 	log.Printf("  - Asset Types: %d", len(assetTypes))
 	log.Printf("  - Suppliers: %d", len(suppliers))
 	log.Printf("  - Data Centers: %d", len(dataCenters))
+	log.Printf("  - Assets: %d", len(assets))
 
 	log.Println("\n🎉 You can now start the API server!")
 }
@@ -387,6 +393,124 @@ func createDataCenters(ctx context.Context, client *ent.Client) []*ent.DataCente
 		}
 		result = append(result, dataCenter)
 	}
+	return result
+}
+
+func createAssets(ctx context.Context, client *ent.Client, assetTypes []*ent.AssetType, warehouses []*ent.Warehouse, locations []*ent.Location, suppliers []*ent.Supplier) []*ent.Asset {
+	var result []*ent.Asset
+
+	// 找到GPU服务器类型
+	var gpuServerType *ent.AssetType
+	for _, at := range assetTypes {
+		if at.Code == "GPU-SERVER" {
+			gpuServerType = at
+			break
+		}
+	}
+
+	// 找到CPU服务器类型
+	var cpuServerType *ent.AssetType
+	for _, at := range assetTypes {
+		if at.Code == "CPU-SERVER" {
+			cpuServerType = at
+			break
+		}
+	}
+
+	// 找到交换机类型
+	var switchType *ent.AssetType
+	for _, at := range assetTypes {
+		if at.Code == "SWITCH-25G" {
+			switchType = at
+			break
+		}
+	}
+
+	// 创建一些GPU服务器
+	if gpuServerType != nil && len(locations) > 0 && len(suppliers) > 0 {
+		for i := 1; i <= 5; i++ {
+			a, err := client.Asset.Create().
+				SetAssetType(gpuServerType).
+				SetAssetNo(fmt.Sprintf("GPU-SRV-%04d", i)).
+				SetName(fmt.Sprintf("GPU服务器-%d", i)).
+				SetSn(fmt.Sprintf("SN-GPU-%d", 1000+i)).
+				SetBrand("NVIDIA").
+				SetModel("DGX A100").
+				SetStatus("in_stock").
+				SetBorrowStatus("available").
+				SetProjectZone("ai_cloud").
+				SetLocation(locations[0]).
+				SetSpecs(map[string]interface{}{
+					"gpu_count": 8,
+					"gpu_model": "A100 80GB",
+					"cpu":       "AMD EPYC 7742",
+					"memory":    "1TB",
+					"storage":   "15TB NVMe",
+				}).
+				Save(ctx)
+			if err != nil {
+				log.Printf("Warning: Failed to create GPU server %d: %v", i, err)
+				continue
+			}
+			result = append(result, a)
+		}
+	}
+
+	// 创建一些CPU服务器
+	if cpuServerType != nil && len(locations) > 1 && len(suppliers) > 0 {
+		for i := 1; i <= 3; i++ {
+			a, err := client.Asset.Create().
+				SetAssetType(cpuServerType).
+				SetAssetNo(fmt.Sprintf("CPU-SRV-%04d", i)).
+				SetName(fmt.Sprintf("CPU服务器-%d", i)).
+				SetSn(fmt.Sprintf("SN-CPU-%d", 2000+i)).
+				SetBrand("Dell").
+				SetModel("PowerEdge R750").
+				SetStatus("in_stock").
+				SetBorrowStatus("available").
+				SetProjectZone("hpc_cloud").
+				SetLocation(locations[1]).
+				SetSpecs(map[string]interface{}{
+					"cpu":     "Intel Xeon Gold 6338",
+					"memory":  "512GB",
+					"storage": "4TB SSD",
+				}).
+				Save(ctx)
+			if err != nil {
+				log.Printf("Warning: Failed to create CPU server %d: %v", i, err)
+				continue
+			}
+			result = append(result, a)
+		}
+	}
+
+	// 创建一些交换机
+	if switchType != nil && len(locations) > 0 && len(suppliers) > 1 {
+		for i := 1; i <= 2; i++ {
+			a, err := client.Asset.Create().
+				SetAssetType(switchType).
+				SetAssetNo(fmt.Sprintf("SW-25G-%04d", i)).
+				SetName(fmt.Sprintf("25G交换机-%d", i)).
+				SetSn(fmt.Sprintf("SN-SW-%d", 3000+i)).
+				SetBrand("H3C").
+				SetModel("S6850-54HF").
+				SetStatus("in_stock").
+				SetBorrowStatus("available").
+				SetLocation(locations[0]).
+				SetSpecs(map[string]interface{}{
+					"ports":      48,
+					"port_speed": "25G",
+					"uplink":     "100G",
+				}).
+				Save(ctx)
+			if err != nil {
+				log.Printf("Warning: Failed to create switch %d: %v", i, err)
+				continue
+			}
+			result = append(result, a)
+		}
+	}
+
 	return result
 }
 

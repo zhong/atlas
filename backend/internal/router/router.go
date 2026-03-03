@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/your-org/atlas/ent"
+	"github.com/your-org/atlas/internal/handler/asset"
 	"github.com/your-org/atlas/internal/handler/auth"
 	"github.com/your-org/atlas/internal/middleware"
 	"github.com/your-org/atlas/pkg/config"
@@ -33,6 +34,7 @@ func Setup(app *fiber.App, client *ent.Client, cfg *config.Config) {
 
 	// 初始化处理器
 	authHandler := auth.NewHandler(client, cfg)
+	assetHandler := asset.NewHandler(client, cfg)
 
 	// 公开路由（不需要认证）
 	public := v1.Group("")
@@ -43,13 +45,12 @@ func Setup(app *fiber.App, client *ent.Client, cfg *config.Config) {
 	// 需要认证的路由
 	protected := v1.Group("", middleware.Auth(&cfg.JWT))
 	{
-		// TODO: 添加需要认证的接口
 		// 资产管理
 		assets := protected.Group("/assets")
 		{
-			assets.Get("/", func(c *fiber.Ctx) error {
-				return c.JSON(fiber.Map{"message": "get assets"})
-			})
+			assets.Get("/", assetHandler.List)
+			assets.Get("/:id", assetHandler.Get)
+			assets.Post("/", assetHandler.Create)
 		}
 
 		// 库存管理
