@@ -8,6 +8,8 @@ import (
 	"github.com/your-org/atlas/internal/handler/asset"
 	"github.com/your-org/atlas/internal/handler/auth"
 	"github.com/your-org/atlas/internal/handler/inventory"
+	"github.com/your-org/atlas/internal/handler/location"
+	"github.com/your-org/atlas/internal/handler/warehouse"
 	"github.com/your-org/atlas/internal/middleware"
 	"github.com/your-org/atlas/pkg/config"
 )
@@ -37,6 +39,8 @@ func Setup(app *fiber.App, client *ent.Client, cfg *config.Config) {
 	authHandler := auth.NewHandler(client, cfg)
 	assetHandler := asset.NewHandler(client, cfg)
 	inventoryHandler := inventory.NewHandler(client, cfg)
+	warehouseHandler := warehouse.NewHandler(client, cfg)
+	locationHandler := location.NewHandler(client, cfg)
 
 	// 公开路由（不需要认证）
 	public := v1.Group("")
@@ -65,6 +69,26 @@ func Setup(app *fiber.App, client *ent.Client, cfg *config.Config) {
 			inventory.Post("/inbound", inventoryHandler.Inbound)
 			inventory.Post("/outbound", inventoryHandler.Outbound)
 			inventory.Post("/transfer", inventoryHandler.Transfer)
+		}
+
+		// 仓库管理
+		warehouses := protected.Group("/warehouses")
+		{
+			warehouses.Get("/", warehouseHandler.List)
+			warehouses.Get("/:id", warehouseHandler.Get)
+			warehouses.Post("/", warehouseHandler.Create)
+			warehouses.Put("/:id", warehouseHandler.Update)
+			warehouses.Delete("/:id", warehouseHandler.Delete)
+		}
+
+		// 库位管理
+		locations := protected.Group("/locations")
+		{
+			locations.Get("/", locationHandler.List)
+			locations.Get("/:id", locationHandler.Get)
+			locations.Post("/", locationHandler.Create)
+			locations.Put("/:id", locationHandler.Update)
+			locations.Delete("/:id", locationHandler.Delete)
 		}
 
 		// 采购管理
