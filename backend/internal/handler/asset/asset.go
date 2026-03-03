@@ -314,3 +314,139 @@ func (h *Handler) Create(c *fiber.Ctx) error {
 		"created_at": a.CreatedAt,
 	})
 }
+
+type UpdateRequest struct {
+	Name         *string                 `json:"name"`
+	SerialNumber *string                 `json:"serial_number"`
+	Brand        *string                 `json:"brand"`
+	Model        *string                 `json:"model"`
+	Status       *string                 `json:"status"`
+	ProjectZone  *string                 `json:"project_zone"`
+	Specs        *map[string]interface{} `json:"specs"`
+	Notes        *string                 `json:"notes"`
+}
+
+// Update 更新资产
+func (h *Handler) Update(c *fiber.Ctx) error {
+	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid asset ID",
+		})
+	}
+
+	var req UpdateRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// 检查资产是否存在
+	exists, err := h.client.Asset.Query().
+		Where(asset.ID(int(id))).
+		Exist(ctx)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to check asset",
+		})
+	}
+	if !exists {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Asset not found",
+		})
+	}
+
+	// 构建更新
+	builder := h.client.Asset.UpdateOneID(int(id))
+
+	if req.Name != nil {
+		builder.SetName(*req.Name)
+	}
+	if req.SerialNumber != nil {
+		builder.SetSn(*req.SerialNumber)
+	}
+	if req.Brand != nil {
+		builder.SetBrand(*req.Brand)
+	}
+	if req.Model != nil {
+		builder.SetModel(*req.Model)
+	}
+	if req.Status != nil {
+		builder.SetStatus(asset.Status(*req.Status))
+	}
+	if req.ProjectZone != nil {
+		builder.SetProjectZone(asset.ProjectZone(*req.ProjectZone))
+	}
+	if req.Specs != nil {
+		builder.SetSpecs(*req.Specs)
+	}
+	if req.Notes != nil {
+		builder.SetNotes(*req.Notes)
+	}
+
+	a, err := builder.Save(ctx)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to update asset",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"id":         a.ID,
+		"asset_no":   a.AssetNo,
+		"name":       a.Name,
+		"status":     string(a.Status),
+		"updated_at": a.UpdatedAt,
+	})
+}
+
+// Delete 删除资产
+func (h *Handler) Delete(c *fiber.Ctx) error {
+	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid asset ID",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// 检查资产是否存在
+	a, err := h.client.Asset.Query().
+		Where(asset.ID(int(id))).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Asset not found",
+			})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to check asset",
+		})
+	}
+
+	// 检查资产状态，只能删除在库状态的资产
+	if a.Status != "in_stock" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Can only delete assets with status 'in_stock'",
+		})
+	}
+
+	// 删除资产
+	if err := h.client.Asset.DeleteOneID(int(id)).Exec(ctx); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to delete asset",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "Asset deleted successfully",
+		"id":      id,
+	})
+}
